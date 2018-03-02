@@ -32,25 +32,26 @@ app.get('/', function(req, res) {
 
 app.post('/', function(req, res) {
   var files = req.files.file
+  console.log('got files', files)
   if (!Array.isArray(files)) {
     return res.sendStatus(500)
   }
   if (files.length !== 2) {
     return res.sendStatus(500)
   }
+  let allResults = fs.readdirSync(RESULTS_DIR)
+  console.log('allResults', allResults)
 
-  let lastRun = fs.readdirSync(RESULTS_DIR)
-
-  if (lastRun) {
-    console.log('lastRun', lastRun)
-  }
-
-  let out = path.join(RESULTS_DIR, `results_${lastRun.length + 1}`)
+  let out = path.join(RESULTS_DIR, `out_${allResults.length + 1}`)
   let content = path.join(__dirname, files[0].path)
   let style = path.join(__dirname, files[1].path)
-
   execa('mkdir', `${out}`)
   // ./demo deep_image_analogy/models/ ../test/content.jpg ../test/style.jpg deep_image_analogy/demo/output/ 0 0.5 2 0
+  console.log(
+    'running',
+    `demo`,
+    `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`,
+  )
   execa(
     `demo`,
     `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`.split(
