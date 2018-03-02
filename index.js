@@ -50,6 +50,10 @@ app.post('/', function(req, res) {
       `./demo deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`,
       {
         cwd: DEEP_ANALOGY_DIR,
+        env: {
+          LD_LIBRARY_PATH:
+            '/home/nw/deep-analogy/build/lib:/usr/local/cuda/lib64',
+        },
       },
     )
   }
