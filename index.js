@@ -30,40 +30,41 @@ app.get('/', function(req, res) {
   )
 })
 
-app.post('/', function(req, res) {
-  var files = req.files.file
-  console.log('got files', files)
-  if (!Array.isArray(files)) {
-    return res.sendStatus(500)
-  }
-  if (files.length !== 2) {
-    return res.sendStatus(500)
-  }
-  let allResults = fs.readdirSync(RESULTS_DIR)
-  console.log('allResults', allResults)
+let files = []
 
-  let out = path.join(RESULTS_DIR, `out_${allResults.length + 1}`)
-  let content = path.join(__dirname, files[0].path)
-  let style = path.join(__dirname, files[1].path)
-  execa('mkdir', `${out}`)
-  // ./demo deep_image_analogy/models/ ../test/content.jpg ../test/style.jpg deep_image_analogy/demo/output/ 0 0.5 2 0
-  console.log(
-    'running',
-    `demo`,
-    `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`,
-  )
-  execa(
-    `demo`,
-    `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`.split(
-      ' ',
-    ),
-    {
-      cwd: DEEP_ANALOGY_DIR,
-    },
-  ).then(done => {
-    console.log('done!')
-    // copy
-  })
+app.post('/', function(req, res) {
+  var file = req.files.file
+  files.push(file)
+
+  if (files.length === 2) {
+    let current = files
+    files = []
+    let allResults = fs.readdirSync(RESULTS_DIR)
+    console.log('allResults', allResults)
+
+    let out = path.join(RESULTS_DIR, `out_${allResults.length + 1}`)
+    let content = path.join(__dirname, files[0].path)
+    let style = path.join(__dirname, files[1].path)
+    execa('mkdir', `${out}`)
+    // ./demo deep_image_analogy/models/ ../test/content.jpg ../test/style.jpg deep_image_analogy/demo/output/ 0 0.5 2 0
+    console.log(
+      'running',
+      `demo`,
+      `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`,
+    )
+    execa(
+      `demo`,
+      `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`.split(
+        ' ',
+      ),
+      {
+        cwd: DEEP_ANALOGY_DIR,
+      },
+    ).then(done => {
+      console.log('done!')
+      // copy
+    })
+  }
 
   res.sendStatus(200)
 })
