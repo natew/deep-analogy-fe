@@ -63,7 +63,7 @@ app.post('/', function(req, res) {
       files = [] // reset for next run
       let allResults = fs.readdirSync(RESULTS_DIR)
       if (!allResults) return
-      let out = path.join(RESULTS_DIR, `out_${allResults.length + 1}`)
+      let out = path.join(RESULTS_DIR, `out_${allResults.length + 2}`)
       let content = path.join(__dirname, current[0].path)
       let style = path.join(__dirname, current[1].path)
       execa.shellSync(`mkdir ${out}`)
