@@ -45,27 +45,13 @@ app.post('/', function(req, res) {
     let out = path.join(RESULTS_DIR, `out_${allResults.length + 1}`)
     let content = path.join(__dirname, current[0].path)
     let style = path.join(__dirname, current[1].path)
-    execa('mkdir', `${out}`)
-    // ./demo deep_image_analogy/models/ ../test/content.jpg ../test/style.jpg deep_image_analogy/demo/output/ 0 0.5 2 0
-    console.log(
-      'in',
-      DEEP_ANALOGY_DIR,
-      'running',
-      `./demo`,
-      `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`,
-    )
-    execa(
-      `./demo`,
-      `deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`.split(
-        ' ',
-      ),
+    execa.shellSync(`mkdir ${out}`)
+    execa.shellSync(
+      `./demo deep_image_analogy/models/ ${content} ${style} ${out} 0 0.5 3 0`,
       {
         cwd: DEEP_ANALOGY_DIR,
       },
-    ).then(done => {
-      console.log('done!')
-      // copy
-    })
+    )
   }
 
   res.sendStatus(200)
