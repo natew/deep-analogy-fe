@@ -66,7 +66,7 @@ app.post('/', function(req, res) {
       let content = path.join(__dirname, current[0].path)
       let style = path.join(__dirname, current[1].path)
       try {
-        const cmd = `./demo deep_image_analogy/models/ ${content} ${style} ${OUT_DIR} 0 ${settings}`
+        const cmd = `./demo deep_image_analogy/models/ ${content} ${style} ${OUT_DIR}/ 0 ${settings}`
         console.log('running', cmd)
         execa.shellSync(cmd, {
           cwd: DEEP_ANALOGY_DIR,
