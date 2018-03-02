@@ -4,6 +4,7 @@ let multer = require('multer')
 let bodyParser = require('body-parser')
 let fs = require('fs')
 let execa = require('execa')
+let serveIndex = require('serve-index')
 
 let app = express()
 let RESULTS_DIR = path.join(__dirname, 'results')
@@ -22,7 +23,11 @@ app.use(multer({ dest: 'uploads' })) // dest is not necessary if you are happy w
 app.use(express.static(path.join(__dirname, 'bower_components')))
 
 // show output files
-app.use('/results', express.static(RESULTS_DIR))
+app.use(
+  '/results',
+  express.static(RESULTS_DIR),
+  serveIndex(RESULTS_DIR, { icons: true }),
+)
 
 // routes
 app.get('/', function(req, res) {
@@ -56,6 +61,7 @@ app.post('/', function(req, res) {
         },
       },
     )
+    console.log('done!')
   }
 
   res.sendStatus(200)
