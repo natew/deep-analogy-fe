@@ -67,7 +67,7 @@ app.post('/', function(req, res) {
   res.sendStatus(200)
 })
 
-var server = app.listen(3000, function() {
+var server = app.listen(80, '0.0.0.0', function() {
   var host = server.address().address,
     port = server.address().port
   console.log('Example app listening at http://%s:%s', host, port)
