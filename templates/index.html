@@ -1,0 +1,32 @@
+<html>
+
+<head>
+  <title>DEEP ANALOGY</title>
+  <link href="/dropzone/downloads/css/dropzone.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>DEEP-ANALOGY</h1>
+  <form method="post" action="/">
+    <select name="type">
+      <option value="0">Photo to Style (Landscape)</option>
+      <option value="1">Photo to Style (Portrait)</option>
+      <option value="2">Style to Style</option>
+      <option value="3">Style to Photo</option>
+      <option value="4">Photo to Photo</option>
+    </select>
+    <input name="smoothing" type="checkbox" /> smoothing
+    <input type="submit" />
+  </form>
+  <form method="post" action="/" class="dropzone" id="dropzone-example">
+    <div class="fallback">
+      <input name="file" type="file" multiple />
+    </div>
+  </form>
+  <p>
+    <a href="/old">Old form version</a>
+  </p>
+  <script src="/dropzone/downloads/dropzone.js"></script>
+</body>
+
+</html>
