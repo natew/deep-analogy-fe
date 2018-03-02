@@ -7,9 +7,9 @@ let execa = require('execa')
 let serveIndex = require('serve-index')
 
 let app = express()
-let RESULTS_DIR = path.join(__dirname, 'results')
-let DEEP_ANALOGY_DIR = path.join(__dirname, '..', 'deep-analogy')
-let OUT_DIR = path.join(
+let RESULTS_DIR = path.resolve(__dirname, 'results')
+let DEEP_ANALOGY_DIR = path.resolve(__dirname, '..', 'deep-analogy')
+let OUT_DIR = path.resolve(
   DEEP_ANALOGY_DIR,
   'deep_image_analogy',
   'demo',
@@ -66,17 +66,18 @@ app.post('/', function(req, res) {
       let content = path.join(__dirname, current[0].path)
       let style = path.join(__dirname, current[1].path)
       try {
-        execa.shellSync(
-          `./demo deep_image_analogy/models/ ${content} ${style} ${OUT_DIR} 0 ${settings}`,
-          {
-            cwd: DEEP_ANALOGY_DIR,
-            env: {
-              LD_LIBRARY_PATH:
-                '/home/nw/deep-analogy/build/lib:/usr/local/cuda/lib64',
-            },
+        const cmd = `./demo deep_image_analogy/models/ ${content} ${style} ${OUT_DIR} 0 ${settings}`
+        console.log('running', cmd)
+        execa.shellSync(cmd, {
+          cwd: DEEP_ANALOGY_DIR,
+          env: {
+            LD_LIBRARY_PATH:
+              '/home/nw/deep-analogy/build/lib:/usr/local/cuda/lib64',
           },
-        )
-        execa.shellSync(`mv ${OUT_DIR} ${out}`)
+        })
+        const cmd2 = `mv ${OUT_DIR} ${out}`
+        console.log(cmd2)
+        execa.shellSync(cmd2)
         execa.shellSync(`mkdir ${OUT_DIR}`)
       } catch (err) {
         console.log('error running deep analogy', err)
