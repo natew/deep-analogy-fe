@@ -6,6 +6,7 @@ let fs = require('fs')
 let execa = require('execa')
 let serveIndex = require('serve-index')
 
+const sleep = ms => new Promise(res => setTimeout(res, ms))
 let app = express()
 let RESULTS_DIR = path.resolve(__dirname, 'results')
 let DEEP_ANALOGY_DIR = path.resolve(__dirname, '..', 'deep-analogy')
@@ -31,6 +32,7 @@ app.use(
 app.get('/', express.static('templates'))
 
 let files = []
+let jobs = []
 let settings = '1 3 0'
 let SETTING_VALS = {
   0: '1 3',
@@ -38,6 +40,44 @@ let SETTING_VALS = {
   2: '0 2',
   3: '0.5 2',
   4: '1 1',
+}
+
+async function processQueue() {
+  while (true) {
+    if (jobs.length) {
+      let job = jobs.shift()
+      console.log('running job', job)
+      let { files, settings } = job
+      let allResults = fs.readdirSync(RESULTS_DIR)
+      if (!allResults) return
+      console.log('results', allResults.length)
+      let out = path.join(RESULTS_DIR, `out_${allResults.length + 2}`)
+      let content = path.join(__dirname, files[0].path)
+      let style = path.join(__dirname, files[1].path)
+      try {
+        const cmd = `./demo deep_image_analogy/models/ ${content} ${style} ${OUT_DIR}/ 0 ${settings}`
+        console.log('running', cmd)
+        await execa.shell(cmd, {
+          cwd: DEEP_ANALOGY_DIR,
+          env: {
+            LD_LIBRARY_PATH:
+              '/home/nw/deep-analogy/build/lib:/usr/local/cuda/lib64',
+          },
+        })
+        const cmd2 = `mv ${OUT_DIR} ${out}`
+        console.log(cmd2)
+        // write out settings for this run
+        await fs.writeFile(path.join(out, 'settings.txt'), cmd)
+        await execa.shell(cmd2)
+        await execa.shell(`mkdir ${OUT_DIR}`)
+      } catch (err) {
+        console.log('error running deep analogy', err)
+      }
+      console.log('done!')
+    } else {
+      await sleep(200)
+    }
+  }
 }
 
 app.post('/', function(req, res) {
@@ -51,41 +91,17 @@ app.post('/', function(req, res) {
     res.redirect('/')
     return
   }
-
   var file = req.files.file
   if (file) {
     files.push(file)
-
     if (files.length === 2) {
-      let current = files
-      files = [] // reset for next run
-      let allResults = fs.readdirSync(RESULTS_DIR)
-      if (!allResults) return
-      console.log('results', allResults.length)
-      let out = path.join(RESULTS_DIR, `out_${allResults.length + 2}`)
-      let content = path.join(__dirname, current[0].path)
-      let style = path.join(__dirname, current[1].path)
-      try {
-        const cmd = `./demo deep_image_analogy/models/ ${content} ${style} ${OUT_DIR}/ 0 ${settings}`
-        console.log('running', cmd)
-        execa.shellSync(cmd, {
-          cwd: DEEP_ANALOGY_DIR,
-          env: {
-            LD_LIBRARY_PATH:
-              '/home/nw/deep-analogy/build/lib:/usr/local/cuda/lib64',
-          },
-        })
-        const cmd2 = `mv ${OUT_DIR} ${out}`
-        console.log(cmd2)
-        execa.shellSync(cmd2)
-        execa.shellSync(`mkdir ${OUT_DIR}`)
-      } catch (err) {
-        console.log('error running deep analogy', err)
-      }
-      console.log('done!')
+      jobs.push({
+        files,
+        settings,
+      })
+      files = []
     }
   }
-
   res.sendStatus(200)
 })
 
@@ -98,3 +114,5 @@ var server = app.listen(
     console.log('Example app listening at http://%s:%s', host, port)
   },
 )
+
+processQueue()
