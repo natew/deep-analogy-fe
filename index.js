@@ -74,10 +74,12 @@ async function processQueue() {
         await execa.shell(`mkdir ${OUT_DIR}`)
         // write out settings for this run
         fs.writeFileSync(path.join(out, 'settings.txt'), cmd)
+        console.log('done!')
       } catch (err) {
         console.log('error running deep analogy', err)
+        console.log('failed!')
+        await execa.shell(`mkdir ${OUT_DIR}`)
       }
-      console.log('done!')
     } else {
       await sleep(200)
     }
