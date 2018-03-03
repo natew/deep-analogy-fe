@@ -70,10 +70,10 @@ async function processQueue() {
         })
         const cmd2 = `mv ${OUT_DIR} ${out}`
         console.log(cmd2)
-        // write out settings for this run
-        fs.writeFileSync(path.join(out, 'settings.txt'), cmd)
         await execa.shell(cmd2)
         await execa.shell(`mkdir ${OUT_DIR}`)
+        // write out settings for this run
+        fs.writeFileSync(path.join(out, 'settings.txt'), cmd)
       } catch (err) {
         console.log('error running deep analogy', err)
       }
