@@ -21,6 +21,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(multer({ dest: 'uploads' })) // dest is not necessary if you are happy with the default: /tmp
 app.use(express.static(path.join(__dirname, 'bower_components')))
 
+app.use('/uploads', express.static('uploads'))
+
 // show output files
 app.use(
   '/results',
