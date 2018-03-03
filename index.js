@@ -42,6 +42,10 @@ let SETTING_VALS = {
   4: '1 1',
 }
 
+app.get('/jobs', (req, res) => {
+  res.send(`<ul>${jobs.map(job => `<li>settings: ${job.settings}</li>`)}</ul>`)
+})
+
 async function processQueue() {
   while (true) {
     if (jobs.length) {
@@ -67,7 +71,7 @@ async function processQueue() {
         const cmd2 = `mv ${OUT_DIR} ${out}`
         console.log(cmd2)
         // write out settings for this run
-        await fs.writeFile(path.join(out, 'settings.txt'), cmd)
+        fs.writeFileSync(path.join(out, 'settings.txt'), cmd)
         await execa.shell(cmd2)
         await execa.shell(`mkdir ${OUT_DIR}`)
       } catch (err) {
