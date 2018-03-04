@@ -63,13 +63,16 @@ async function processQueue() {
       try {
         const cmd = `./demo deep_image_analogy/models/ ${content} ${style} ${OUT_DIR}/ 0 ${settings}`
         console.log('running', cmd)
-        await execa.shell(cmd, {
+        const deepanal = execa.shell(cmd, {
           cwd: DEEP_ANALOGY_DIR,
           env: {
             LD_LIBRARY_PATH:
               '/home/nw/deep-analogy/build/lib:/usr/local/cuda/lib64',
           },
         })
+        deepanal.stdout.pipe(process.stdout)
+        deepanal.stderr.pipe(process.stderr)
+        await deepanal
         const cmd2 = `mv ${OUT_DIR} ${out}`
         console.log(cmd2)
         await execa.shell(cmd2)
